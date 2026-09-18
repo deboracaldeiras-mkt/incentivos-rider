@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incentivos Daki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0A1140;
+    --surface: #121B57;
+    --surface-2: #1A2570;
+    --line: #2E3B93;
+    --text: #F3F5FF;
+    --muted: #96A1D6;
+    --blue: #3D5CFF;
+    --blue-dim: #1B2A8F;
+    --yellow: #FFCC00;
+    --yellow-dim: #4A3E00;
+    --danger: #FF6B6B;
+    --radius: 18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% -10%, #1D2C8C 0%, transparent 45%),
+      radial-gradient(circle at 100% 10%, #142073 0%, transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 16px;
+  }
+  .app{
+    width:100%;
+    max-width:420px;
+    position:relative;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:28px;
+    justify-content:center;
+  }
+  .brand .mark-logo{
+    height:28px;
+    width:auto;
+    display:block;
+  }
+  .brand .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    border:1px solid var(--line);
+    padding:3px 8px;
+    border-radius:100px;
+  }
+
+  /* ---------- CARD ---------- */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px 26px;
+    box-shadow: 0 30px 60px -25px rgba(0,0,0,0.6);
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    top:-60px; right:-60px;
+    width:180px; height:180px;
+    background: radial-gradient(circle, rgba(61,92,255,0.30), transparent 70%);
+    pointer-events:none;
+  }
+
+  /* ---------- LOGIN ---------- */
+  #login-view h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:22px;
+    font-weight:600;
+    margin:0 0 6px;
+  }
+  #login-view p.sub{
+    color:var(--muted);
+    font-size:14px;
+    margin:0 0 26px;
+    line-height:1.5;
+  }
+  label{
+    display:block;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:8px;
+  }
+  input[type="text"]{
+    width:100%;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size:16px;
+    padding:14px 14px;
+    border-radius:12px;
+    outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  input[type="text"]::placeholder{ color:#5C5480; font-family:'Inter', sans-serif; }
+  input[type="text"]:focus{
+    border-color:var(--blue);
+    box-shadow: 0 0 0 3px rgba(61,92,255,0.28);
+  }
+  .btn{
+    width:100%;
+    margin-top:20px;
+    padding:14px 16px;
+    border-radius:12px;
+    border:none;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:15px;
+    cursor:pointer;
+    transition:transform .12s ease, filter .15s ease;
+  }
+  .btn:active{ transform:scale(0.98); }
+  .btn-primary{
+    background:linear-gradient(135deg, var(--yellow), #FFE066);
+    color:#0A1140;
+  }
+  .btn-primary:hover{ filter:brightness(1.08); }
+  .btn-ghost{
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--line);
+  }
+  .btn-ghost:hover{ color:var(--text); border-color:var(--muted); }
+
+  .error-msg{
+    display:none;
+    margin-top:14px;
+    padding:12px 14px;
+    background:rgba(255,107,94,0.1);
+    border:1px solid rgba(255,107,94,0.35);
+    color:var(--danger);
+    border-radius:10px;
+    font-size:13px;
+    line-height:1.5;
+  }
+  .error-msg.show{ display:block; }
+
+  .loading-msg{
+    display:none;
+    margin-top:14px;
+    color:var(--muted);
+    font-size:13px;
+    text-align:center;
+  }
+  .loading-msg.show{ display:block; }
+
+  /* ---------- DASHBOARD ---------- */
+  #dash-view{ display:none; }
+  .dash-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    margin-bottom:22px;
+  }
+  .dash-header .greet{ font-family:'Space Grotesk', sans-serif; font-size:20px; font-weight:600; }
+  .dash-header .sub-caption{ color:var(--muted); font-size:12.5px; margin-top:6px; }
+
+  .icon-btn{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--muted);
+    width:36px; height:36px;
+    border-radius:10px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .icon-btn:hover{ color:var(--text); border-color:var(--muted); }
+
+  .medal-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-top:8px;
+    padding:4px 10px 4px 8px;
+    border-radius:100px;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.03em;
+    border:1px solid transparent;
+  }
+  .medal-badge .medal-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .medal-badge.ouro{ background:rgba(255,204,0,0.14); border-color:rgba(255,204,0,0.4); color:#FFD500; }
+  .medal-badge.ouro .medal-dot{ background:#FFD500; box-shadow:0 0 8px rgba(255,213,0,0.7); }
+  .medal-badge.prata{ background:rgba(199,206,219,0.14); border-color:rgba(199,206,219,0.4); color:#D7DCE8; }
+  .medal-badge.prata .medal-dot{ background:#C7CEDB; }
+  .medal-badge.bronze{ background:rgba(205,127,50,0.16); border-color:rgba(205,127,50,0.45); color:#E3A365; }
+  .medal-badge.bronze .medal-dot{ background:#CD7F32; }
+
+  .section-title{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--muted);
+    margin:0 0 10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .section-title .live-dot{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:10.5px;
+    color:var(--yellow);
+    text-transform:none;
+    letter-spacing:0;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .section-title .live-dot::before{
+    content:"";
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--yellow);
+    box-shadow:0 0 6px rgba(255,204,0,0.7);
+  }
+  .section-title .live-dot.fallback{ color:var(--danger); }
+  .section-title .live-dot.fallback::before{
+    background:var(--danger);
+    box-shadow:0 0 6px rgba(255,107,107,0.7);
+  }
+
+  .incentive-card{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 16px 14px;
+    margin-bottom:12px;
+  }
+  .incentive-card.done{ border-color: var(--yellow-dim); background: rgba(255,204,0,0.06); }
+  .incentive-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:12px;
+    gap:8px;
+  }
+  .incentive-name{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    text-transform:capitalize;
+  }
+  .incentive-pct{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    font-weight:700;
+    color:var(--yellow);
+    flex-shrink:0;
+  }
+  .incentive-track{
+    position:relative;
+    height:6px;
+    background:var(--line);
+    border-radius:100px;
+    margin:16px 4px 14px;
+    overflow:visible;
+  }
+  .incentive-fill{
+    position:absolute;
+    top:0; left:0; height:100%;
+    background:linear-gradient(90deg, var(--blue), var(--yellow));
+    border-radius:100px;
+    width:0%;
+    overflow:hidden;
+    transition:width 1s cubic-bezier(.22,1,.36,1);
+  }
+  .incentive-fill::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.35) 0 6px, transparent 6px 14px);
+    animation: dash-move 1.2s linear infinite;
+    opacity:0.5;
+  }
+  @keyframes dash-move{ from{ background-position:0 0; } to{ background-position:-20px 0; } }
+  .incentive-pin{
+    position:absolute;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:20px; height:20px;
+    background:var(--bg);
+    border:2px solid var(--yellow);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px;
+    transition:left 1s cubic-bezier(.22,1,.36,1);
+    left:0%;
+    z-index:1;
+  }
+  .incentive-bottom{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    color:var(--muted);
+    font-family:'JetBrains Mono', monospace;
+  }
+  .incentive-status{
+    margin-top:8px;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .incentive-status.done-text{ color:var(--yellow); font-weight:600; }
+
+  .empty-note{
+    text-align:center;
+    font-size:13px;
+    color:var(--muted);
+    margin-top:8px;
+    line-height:1.5;
+  }
+
+  .portal-block{
+    margin-top:22px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+    text-align:center;
+  }
+  .portal-text{
+    font-size:13px;
+    color:var(--muted);
+    margin:0 0 12px;
+  }
+  .portal-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    width:100%;
+    margin-top:0;
+  }
+
+  /* admin */
+  .admin-toggle{
+    position:absolute;
+    top:-6px; right:-6px;
+    width:30px; height:30px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--muted);
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px;
+    opacity:0.6;
+  }
+  .admin-toggle:hover{ opacity:1; color:var(--text); }
+  #admin-view{ display:none; }
+  #admin-view textarea{
+    width:100%;
+    min-height:140px;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    padding:12px;
+    border-radius:10px;
+    resize:vertical;
+  }
+  #admin-view .hint{
+    font-size:12px;
+    color:var(--muted);
+    margin:10px 0 4px;
+    line-height:1.6;
+  }
+  #admin-status{
+    font-size:12.5px;
+    margin-top:10px;
+    color:var(--yellow);
+    display:none;
+  }
+  #admin-status.show{ display:block; }
+  #admin-view .field{ margin-top:14px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="brand">
+    <img class="mark-logo" src="data:image/webp;base64,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" alt="Daki">
+    <div class="tag">Incentivos</div>
+  </div>
+
+  <div class="card">
+    <button class="admin-toggle" id="admin-open" title="Área interna">⚙</button>
+
+    <!-- LOGIN -->
+    <div id="login-view">
+      <h1>Consulte seu bônus</h1>
+      <p class="sub">Digite seu ID de entregador para ver quais incentivos estão ativos e o quanto você já realizou.</p>
+
+      <label for="doc-input">ID do entregador</label>
+      <input type="text" id="doc-input" placeholder="Seu ID de entregador" autocomplete="off" inputmode="text">
+
+      <button class="btn btn-primary" id="login-btn">Entrar</button>
+
+      <div class="loading-msg" id="loading-msg">Buscando seus dados na planilha…</div>
+      <div class="error-msg" id="error-msg"></div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dash-view">
+      <div class="dash-header">
+        <div>
+          <div class="greet" id="dash-greet">Olá,</div>
+          <div class="medal-badge" id="medal-badge"><span class="medal-dot"></span><span id="medal-text">—</span></div>
+          <div class="sub-caption" id="dash-caption">ID: —</div>
+        </div>
+        <button class="icon-btn" id="logout-btn" title="Sair">⏎</button>
+      </div>
+
+      <p class="section-title">
+        <span>Seus incentivos</span>
+        <span class="live-dot" id="fonte-dados">planilha</span>
+      </p>
+      <div id="incentives-list"></div>
+      <div class="empty-note" id="empty-note" style="display:none;">Nenhum incentivo ativo encontrado pra esse ID no momento.</div>
+
+      <div class="portal-block">
+        <p class="portal-text">Dúvidas? Consulte o portal do entregador</p>
+        <a class="btn btn-ghost portal-btn" href="https://sites.google.com/soudaki.com/seguroentregadoresdaki/home" target="_blank" rel="noopener noreferrer">Portal do entregador ↗</a>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="admin-view">
+      <h1 style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;margin:0 0 6px;">Área interna</h1>
+      <p class="sub" style="margin-bottom:14px;">Configure aqui a URL da API da planilha (Apps Script). Incentivos e medalha vêm sempre direto de lá.</p>
+
+      <div class="field">
+        <label for="admin-api-url">URL da API da planilha (Apps Script)</label>
+        <input type="text" id="admin-api-url" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+      </div>
+      <button class="btn btn-primary" id="admin-save-url" style="margin-top:10px;">Salvar URL</button>
+
+      <button class="btn btn-ghost" id="admin-back" style="margin-top:18px;">Voltar pro login</button>
+      <div id="admin-status"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  const loginView = document.getElementById('login-view');
+  const dashView = document.getElementById('dash-view');
+  const adminView = document.getElementById('admin-view');
+  const docInput = document.getElementById('doc-input');
+  const loginBtn = document.getElementById('login-btn');
+  const errorMsg = document.getElementById('error-msg');
+  const loadingMsg = document.getElementById('loading-msg');
+
+  // ==== CONFIGURAÇÃO DA API DA PLANILHA ====
+  // Troque pela URL do Apps Script publicado (veja apps-script-incentivos.gs).
+  // Pode também ser configurada pela área interna (⚙), sem editar o código.
+  let SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbxQ5aN8lvrabAQUgScxhhG1IHhH-d7cTVg3dRCcRcC69vkU89a4COoTmomol2pFcEbH/exec';
+
+  function normalizeId(raw){
+    if(!raw) return '';
+    return raw.trim().toUpperCase();
+  }
+
+  function showError(msg){
+    errorMsg.textContent = msg;
+    errorMsg.classList.add('show');
+  }
+  function clearError(){
+    errorMsg.classList.remove('show');
+    errorMsg.textContent = '';
+  }
+
+  function hasStorage(){
+    return typeof window.storage !== 'undefined' && window.storage !== null;
+  }
+
+  // ---- Dados de demonstração (usados se a URL da planilha não estiver configurada,
+  // ou se a chamada à planilha falhar) — garante que o artefato sempre seja testável.
+  // Em uso normal, tanto a medalha quanto os incentivos vêm da mesma resposta da planilha. ----
+  const DEMO_DATA = {
+    '1234': { medalha:'OURO', incentivos:[ { incentivo:'novo rider', alvo:50, realizado:42, percentual:84 } ] },
+    '11111111111': { medalha:'PRATA', incentivos:[ { incentivo:'novo rider', alvo:50, realizado:34, percentual:68 } ] },
+    '22222222222': { medalha:'OURO', incentivos:[
+      { incentivo:'novo rider', alvo:50, realizado:78, percentual:100 },
+      { incentivo:'produtividade', alvo:80, realizado:78, percentual:97.5 }
+    ] },
+    'DAKI4521': { medalha:'OURO', incentivos:[ { incentivo:'performance ouro', alvo:120, realizado:125, percentual:100 } ] }
+  };
+
+  // ---- Configuração salva (URL da API) ----
+  async function loadApiUrl(){
+    if(hasStorage()){
+      try{
+        const res = await window.storage.get('config:sheet_api_url', true);
+        if(res && res.value) SHEET_API_URL = res.value;
+      }catch(e){ /* ainda não configurado */ }
+    }
+    document.getElementById('admin-api-url').value = SHEET_API_URL;
+  }
+  loadApiUrl();
+
+  // Chamada via JSONP: o Apps Script não envia cabeçalhos de CORS, então um
+  // fetch() comum é bloqueado pelo navegador mesmo quando o script responde
+  // certinho. Carregar a resposta como uma tag <script> contorna isso, porque
+  // scripts não são bloqueados por CORS do mesmo jeito que fetch/XHR são.
+  function jsonpRequest(url){
+    return new Promise((resolve, reject)=>{
+      const callbackName = 'jsonp_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      const script = document.createElement('script');
+      let settled = false;
+
+      const limpar = () => {
+        delete window[callbackName];
+        script.remove();
+      };
+
+      window[callbackName] = (data) => {
+        settled = true;
+        limpar();
+        resolve(data);
+      };
+
+      script.onerror = () => {
+        if(!settled){ limpar(); reject(new Error('Falha ao carregar a resposta da planilha.')); }
+      };
+
+      const separador = url.includes('?') ? '&' : '?';
+      script.src = url + separador + 'callback=' + callbackName;
+      document.body.appendChild(script);
+
+      setTimeout(()=>{
+        if(!settled){ limpar(); reject(new Error('A planilha demorou demais pra responder.')); }
+      }, 10000);
+    });
+  }
+
+  // ---- Busca medalha + incentivos reais na planilha (via Apps Script) ----
+  // Uma chamada só: a mesma resposta traz tudo que existe pra esse ID.
+  async function fetchDadosRider(id){
+    if(SHEET_API_URL){
+      try{
+        const data = await jsonpRequest(SHEET_API_URL + '?id=' + encodeURIComponent(id));
+        if(data && Array.isArray(data.incentivos)){
+          return { medalha: data.medalha || '', incentivos: data.incentivos, fonte: 'planilha' };
+        }
+        console.error('API da planilha respondeu, mas em formato inesperado:', data);
+      }catch(e){
+        console.error('Falha ao chamar a API da planilha:', e);
+      }
+    }
+    if(DEMO_DATA[id]) return { ...JSON.parse(JSON.stringify(DEMO_DATA[id])), fonte: 'demonstração' };
+    return null;
+  }
+
+  function renderIncentives(incentivos){
+    const list = document.getElementById('incentives-list');
+    const emptyNote = document.getElementById('empty-note');
+    list.innerHTML = '';
+
+    if(!incentivos || incentivos.length === 0){
+      emptyNote.style.display = 'block';
+      return;
+    }
+    emptyNote.style.display = 'none';
+
+    incentivos.forEach(inc=>{
+      const alvo = Number(inc.alvo) || 0;
+      const realizado = Number(inc.realizado) || 0;
+      let pct = inc.percentual !== undefined && inc.percentual !== null && inc.percentual !== ''
+        ? Number(inc.percentual)
+        : (alvo > 0 ? (realizado/alvo)*100 : 0);
+      // Defesa extra: se vier como fração (ex: 0.53 em vez de 53), normaliza.
+      if(pct > 0 && pct <= 1) pct = pct * 100;
+      const pctClamped = Math.max(0, Math.min(100, pct));
+      const isDone = pct >= 100;
+      const faltam = Math.max(0, alvo - realizado);
+
+      const card = document.createElement('div');
+      card.className = 'incentive-card' + (isDone ? ' done' : '');
+      card.innerHTML = `
+        <div class="incentive-top">
+          <span class="incentive-name">${inc.incentivo || 'Incentivo'}</span>
+          <span class="incentive-pct">${pct.toFixed(0)}%</span>
+        </div>
+        <div class="incentive-track">
+          <div class="incentive-fill" style="width:0%"></div>
+          <div class="incentive-pin" style="left:0%">⚡</div>
+        </div>
+        <div class="incentive-bottom">
+          <span>Realizado: ${realizado}</span>
+          <span>Alvo: ${alvo}</span>
+        </div>
+        <div class="incentive-status ${isDone ? 'done-text' : ''}">
+          ${isDone ? 'Bônus garantido 🎉' : 'Faltam ' + faltam + ' entregas'}
+        </div>
+      `;
+      list.appendChild(card);
+      requestAnimationFrame(()=>{
+        card.querySelector('.incentive-fill').style.width = pctClamped + '%';
+        card.querySelector('.incentive-pin').style.left = pctClamped + '%';
+      });
+    });
+  }
+
+  function renderDashboard(data, id){
+    document.getElementById('dash-greet').textContent = 'Olá, rider!';
+    document.getElementById('dash-caption').textContent = 'ID: ' + id;
+
+    const fonteEl = document.getElementById('fonte-dados');
+    if(data.fonte === 'demonstração'){
+      fonteEl.textContent = 'demonstração (planilha não respondeu)';
+      fonteEl.classList.add('fallback');
+    } else {
+      fonteEl.textContent = 'planilha';
+      fonteEl.classList.remove('fallback');
+    }
+
+    const medalha = data.medalha ? String(data.medalha).toUpperCase() : '';
+    const medalBadge = document.getElementById('medal-badge');
+    medalBadge.classList.remove('ouro','prata','bronze');
+    if(medalha){
+      medalBadge.classList.add(medalha.toLowerCase());
+      document.getElementById('medal-text').textContent = 'Você é medalha: ' + medalha;
+      medalBadge.style.display = 'inline-flex';
+    } else {
+      medalBadge.style.display = 'none';
+    }
+
+    renderIncentives(data.incentivos);
+
+    loginView.style.display = 'none';
+    dashView.style.display = 'block';
+    adminView.style.display = 'none';
+  }
+
+  async function doLogin(){
+    clearError();
+    const raw = docInput.value.trim();
+    if(!raw){
+      showError('Digite seu ID de entregador pra continuar.');
+      return;
+    }
+    const id = normalizeId(raw);
+    loginBtn.disabled = true;
+    loadingMsg.classList.add('show');
+
+    const data = await fetchDadosRider(id);
+
+    loadingMsg.classList.remove('show');
+    loginBtn.disabled = false;
+
+    if(!data || !data.incentivos || data.incentivos.length === 0){
+      showError('Não encontramos incentivos pra esse ID. Confira e tente de novo.');
+      return;
+    }
+    renderDashboard(data, id);
+  }
+
+  loginBtn.addEventListener('click', doLogin);
+  docInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') doLogin(); });
+
+  document.getElementById('logout-btn').addEventListener('click', ()=>{
+    docInput.value = '';
+    clearError();
+    dashView.style.display = 'none';
+    loginView.style.display = 'block';
+  });
+
+  // ---- admin ----
+  const adminOpen = document.getElementById('admin-open');
+  const adminBack = document.getElementById('admin-back');
+  const adminSaveUrl = document.getElementById('admin-save-url');
+  const adminStatus = document.getElementById('admin-status');
+
+  adminOpen.addEventListener('click', ()=>{
+    loginView.style.display = 'none';
+    dashView.style.display = 'none';
+    adminView.style.display = 'block';
+  });
+  adminBack.addEventListener('click', ()=>{
+    adminView.style.display = 'none';
+    loginView.style.display = 'block';
+  });
+
+  adminSaveUrl.addEventListener('click', async ()=>{
+    const url = document.getElementById('admin-api-url').value.trim();
+    SHEET_API_URL = url;
+    adminStatus.classList.remove('show');
+    if(hasStorage()){
+      try{
+        await window.storage.set('config:sheet_api_url', url, true);
+        adminStatus.textContent = 'URL da planilha salva com sucesso.';
+        adminStatus.style.color = 'var(--yellow)';
+        adminStatus.classList.add('show');
+        return;
+      }catch(e){ /* segue pro aviso abaixo */ }
+    }
+    adminStatus.textContent = 'URL aplicada nesta sessão (não foi possível salvar de forma permanente aqui).';
+    adminStatus.style.color = 'var(--yellow)';
+    adminStatus.classList.add('show');
+  });
+})();
+</script>
+
+</body>
+</html>
